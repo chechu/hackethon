@@ -1,31 +1,36 @@
-pragma solidity ^0.4.0;
+pragma solidity ^0.4.10;
 
 contract Grade {
     
     mapping(address => Record[]) records;
+    mapping(address => string[]) registrarToCenters;
+    mapping(address => string[]) alumnToCenters;
     
     struct Record {
         address alumn;
         address registrar;
+        string subject;
         uint mark;
-        string signature;
     }
     
     function Grade() public {
         
     }
     
-    function registerMark(address alumn, string signature, uint mark) public {
-        records[alumn].push(Record(alumn, msg.sender, mark, signature));
+    function registerMark(address alumn, string subject, uint mark) public {
+        string[] allowedCentersForRegistrar = registrarToCenters[msg.sender];
+        string[] allowedCentersForAlumn = alumnToCenters[alumn];
+        
+        records[alumn].push(Record(alumn, msg.sender, subject, mark));
     }
     
-    function getNumSignatures() constant returns(uint) {
+    function getNumSubjects() constant returns(uint) {
         return records[msg.sender].length;
     }
     
-    function getSignature(uint index) returns(string) {
+    function getSubjects(uint index) returns(string) {
         Record[] alumnRecords = records[msg.sender];
-        return alumnRecords[index].signature;
+        return alumnRecords[index].subject;
     }
     
     function getMark(uint index) public view returns(uint) {
@@ -33,3 +38,4 @@ contract Grade {
         return alumnRecords[index].mark;
     }
 }
+
