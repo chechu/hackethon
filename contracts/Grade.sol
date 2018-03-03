@@ -87,7 +87,7 @@ contract Grade {
     /*
      * It returns the number of alumn's records (sender of the message) in the contract
      */
-    function getNumRecords() constant returns(uint) {
+    function getNumRecords() public constant returns(uint) {
         return records[msg.sender].length;
     }
     
@@ -95,7 +95,7 @@ contract Grade {
      * It returns the name of the subject associated with the record whose index is passed as parameter
      */
     function getRecordSubject(uint recordIndex) public view returns(string) {
-        Record[] alumnRecords = records[msg.sender];
+        Record[] storage alumnRecords = records[msg.sender];
         require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
         
         return alumnRecords[recordIndex].subject;
@@ -105,7 +105,7 @@ contract Grade {
      * It returns the mark of the subject associated with the record whose index is passed as parameter
      */
     function getRecordMark(uint recordIndex) public view returns(uint) {
-        Record[] alumnRecords = records[msg.sender];
+        Record[] storage alumnRecords = records[msg.sender];
         require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
 
         return alumnRecords[recordIndex].mark;
@@ -115,7 +115,7 @@ contract Grade {
      * It returns the creation time of the record whose index is passed as parameter
      */
     function getRecordCreationTime(uint recordIndex) public view returns(uint) {
-        Record[] alumnRecords = records[msg.sender];
+        Record[] storage alumnRecords = records[msg.sender];
         require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
 
         return alumnRecords[recordIndex].creationTime;
@@ -125,7 +125,7 @@ contract Grade {
      * It returns the last update time of the record whose index is passed as parameter
      */
     function getRecordLastUpdateTime(uint recordIndex) public view returns(uint) {
-        Record[] alumnRecords = records[msg.sender];
+        Record[] storage alumnRecords = records[msg.sender];
         require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
 
         return alumnRecords[recordIndex].lastUpdateTime;
@@ -135,7 +135,7 @@ contract Grade {
      * It returns the state of the record whose index is passed as parameter
      */
     function getRecordState(uint recordIndex) public view returns(uint) {
-        Record[] alumnRecords = records[msg.sender];
+        Record[] storage alumnRecords = records[msg.sender];
         require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
 
         return uint(alumnRecords[recordIndex].state);
@@ -144,9 +144,9 @@ contract Grade {
     /*
      * The registrar must belong to any univerity where the alumn is signed
      */
-    function registarCanRegisterMarkAlumn(address registrar, address alumn) private returns(bool) {
-        string[] allowedCentersForRegistrar = registrarToCenters[registrar];
-        string[] allowedCentersForAlumn = alumnToCenters[alumn];
+    function registarCanRegisterMarkAlumn(address registrar, address alumn) private view returns(bool) {
+        string[] storage allowedCentersForRegistrar = registrarToCenters[registrar];
+        string[] storage allowedCentersForAlumn = alumnToCenters[alumn];
         
         for(uint i = 0; i < allowedCentersForRegistrar.length; i++) {
             for(uint j = 0; j < allowedCentersForAlumn.length; j++) {
@@ -159,8 +159,8 @@ contract Grade {
         return false;
     }
     
-    function registrarCanAddAlumn(address registrar, string center) returns(bool) {
-        string[] allowedCentersForRegistrar = registrarToCenters[registrar];
+    function registrarCanAddAlumn(address registrar, string center) private view returns(bool) {
+        string[] storage allowedCentersForRegistrar = registrarToCenters[registrar];
 
         for(uint i = 0; i < allowedCentersForRegistrar.length; i++) {
             if(keccak256(allowedCentersForRegistrar[i]) == keccak256(center)) {
@@ -171,8 +171,8 @@ contract Grade {
         return false;
     }
     
-    function alumnCanRefuteRecord(address alumn, uint recordIndex) returns(bool) {
-        Record[] alumnRecords = records[alumn];
+    function alumnCanRefuteRecord(address alumn, uint recordIndex) private view returns(bool) {
+        Record[] storage alumnRecords = records[alumn];
         return (recordIndex >= 0 && recordIndex < alumnRecords.length && 
         alumnRecords.length > 0 && alumnRecords[recordIndex].state == RecordState.Valid);
     }
@@ -180,8 +180,8 @@ contract Grade {
     /*
      * The registrar must be who added the refuted register in the past.
      */
-    function registrarCanValidateRecord(address registrar, address alumn, uint recordIndex) returns(bool) {
-        Record[] alumnRecords = records[alumn];
+    function registrarCanValidateRecord(address registrar, address alumn, uint recordIndex) private view returns(bool) {
+        Record[] storage alumnRecords = records[alumn];
         return (recordIndex >= 0 && recordIndex < alumnRecords.length && 
         alumnRecords.length > 0 && 
         alumnRecords[recordIndex].registrar == registrar &&
