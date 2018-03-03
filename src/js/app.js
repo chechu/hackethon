@@ -53,7 +53,7 @@ App = {
   },
 
   bindEvents: function() {
-    $(document).on('click', '.btn-adopt', App.handleAdopt);
+    $(document).on('click', '.btn-reg', App.handleRegister);
   },
 
   markGrade: function(marks, account) {
@@ -62,7 +62,7 @@ App = {
     App.contracts.Grade.deployed().then(function(instance) {
       gradeInstance = instance;
     
-      return gradeInstance.getMark.call();
+      return gradeInstance.getMark();
     }).then(function(marks) {
       for (i = 0; i < marks.length; i++) {
         if (marks[i] !== '0x0000000000000000000000000000000000000000') {
@@ -74,14 +74,31 @@ App = {
     });
   },
 
-  handleAdopt: function(event) {
+  handleRegister: function(event) {
     event.preventDefault();
 
     var petId = parseInt($(event.target).data('id'));
 
-    /*
-     * Replace me...
-     */
+    var gradeInstance;
+
+    web3.eth.getAccounts(function(error, accounts) {
+      if (error) {
+        console.log(error);
+      }
+    
+      var account = accounts[0];
+    
+      App.contracts.Grade.deployed().then(function(instance) {
+        gradeInstance = instance;
+    
+        // Execute adopt as a transaction by sending account
+        return gradeInstance.addRegistrarToCenter("0xf17f52151ebef6c7334fad080c5704d77216b732", "UCMIII");
+      }).then(function(result) {
+        return App.markGrade();
+      }).catch(function(err) {
+        console.log(err.message);
+      });
+    });
   }
 
 };
