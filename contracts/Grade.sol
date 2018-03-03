@@ -96,7 +96,7 @@ contract Grade {
      */
     function getRecordSubject(uint recordIndex) public view returns(string) {
         Record[] alumnRecords = records[msg.sender];
-        require(alumnRecords.length > 0 && recordIndex > 0 && recordIndex < alumnRecords.length);
+        require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
         
         return alumnRecords[recordIndex].subject;
     }
@@ -106,7 +106,7 @@ contract Grade {
      */
     function getRecordMark(uint recordIndex) public view returns(uint) {
         Record[] alumnRecords = records[msg.sender];
-        require(alumnRecords.length > 0 && recordIndex > 0 && recordIndex < alumnRecords.length);
+        require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
 
         return alumnRecords[recordIndex].mark;
     }
@@ -116,9 +116,29 @@ contract Grade {
      */
     function getRecordCreationTime(uint recordIndex) public view returns(uint) {
         Record[] alumnRecords = records[msg.sender];
-        require(alumnRecords.length > 0 && recordIndex > 0 && recordIndex < alumnRecords.length);
+        require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
 
         return alumnRecords[recordIndex].creationTime;
+    }
+    
+    /*
+     * It returns the last update time of the record whose index is passed as parameter
+     */
+    function getRecordLastUpdateTime(uint recordIndex) public view returns(uint) {
+        Record[] alumnRecords = records[msg.sender];
+        require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
+
+        return alumnRecords[recordIndex].lastUpdateTime;
+    }
+    
+    /*
+     * It returns the state of the record whose index is passed as parameter
+     */
+    function getRecordState(uint recordIndex) public view returns(uint) {
+        Record[] alumnRecords = records[msg.sender];
+        require(alumnRecords.length > 0 && recordIndex >= 0 && recordIndex < alumnRecords.length);
+
+        return uint(alumnRecords[recordIndex].state);
     }
     
     /*
@@ -153,7 +173,7 @@ contract Grade {
     
     function alumnCanRefuteRecord(address alumn, uint recordIndex) returns(bool) {
         Record[] alumnRecords = records[alumn];
-        return (recordIndex > 0 && recordIndex < alumnRecords.length && 
+        return (recordIndex >= 0 && recordIndex < alumnRecords.length && 
         alumnRecords.length > 0 && alumnRecords[recordIndex].state == RecordState.Valid);
     }
     
@@ -162,7 +182,7 @@ contract Grade {
      */
     function registrarCanValidateRecord(address registrar, address alumn, uint recordIndex) returns(bool) {
         Record[] alumnRecords = records[alumn];
-        return (recordIndex > 0 && recordIndex < alumnRecords.length && 
+        return (recordIndex >= 0 && recordIndex < alumnRecords.length && 
         alumnRecords.length > 0 && 
         alumnRecords[recordIndex].registrar == registrar &&
         alumnRecords[recordIndex].state == RecordState.Refuted);
